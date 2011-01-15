@@ -40,7 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChainGenerator.cs" />
+    <Compile Include="MarkovChain.cs" />
     <Compile Include="ChainState.cs" />
     <Compile Include="IRandom.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

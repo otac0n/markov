@@ -1,5 +1,5 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="ChainGenerator.cs" company="(none)">
+// <copyright file="MarkovChain.cs" company="(none)">
 //  Copyright © 2011 John Gietzen.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -29,7 +29,7 @@ namespace Markov
     using System.Collections.Generic;
     using System.Linq;
 
-    public class ChainGenerator<T> where T : IEquatable<T>
+    public class MarkovChain<T> where T : IEquatable<T>
     {
         private readonly int order;
 
@@ -37,9 +37,9 @@ namespace Markov
         private readonly Dictionary<ChainState<T>, int> terminals = new Dictionary<ChainState<T>, int>();
 
         /// <summary>
-        /// Initializes a new instance of the ChainGenerator class.
+        /// Initializes a new instance of the MarkovChain class.
         /// </summary>
-        /// <param name="order">Indicates the desired order of the <see cref="ChainGenerator"/>.</param>
+        /// <param name="order">Indicates the desired order of the <see cref="MarkovChain"/>.</param>
         /// <remarks>
         /// <para>The <paramref name="order"/> of a generator indicates the depth of its internal state.  A generator
         /// with an order of 1 will choose items based on the previous item, a generator with an order of 2
@@ -48,7 +48,7 @@ namespace Markov
         /// effect that every state is equivalent to the starting state, and so items will be chosen based on their
         /// total frequency.</para>
         /// </remarks>
-        public ChainGenerator(int order)
+        public MarkovChain(int order)
         {
             if (order < 0)
             {

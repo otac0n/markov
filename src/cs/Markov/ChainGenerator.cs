@@ -115,6 +115,16 @@ namespace Markov
 
         public IEnumerable<T> Chain(Random rand)
         {
+            return this.Chain(new RandomWrapper(rand));
+        }
+
+        public IEnumerable<T> Chain(System.Security.Cryptography.RandomNumberGenerator rand)
+        {
+            return this.Chain(new RandomNumberGeneratorWrapper(rand));
+        }
+
+        public IEnumerable<T> Chain(IRandom rand)
+        {
             Queue<T> previous = new Queue<T>();
             while (true)
             {

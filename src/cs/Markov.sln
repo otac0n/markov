@@ -4,9 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Markov", "Markov\Markov.csproj", "{BA051DA7-AC13-4709-8829-4DC82DECCF4B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EF1DCEFD-B7C8-46AB-B493-3F39ECE152A2}"
-	ProjectSection(SolutionItems) = preProject
-		Settings.StyleCop = Settings.StyleCop
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

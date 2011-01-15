@@ -36,9 +36,21 @@ namespace Markov
         private readonly Dictionary<ChainState<T>, Dictionary<T, int>> items = new Dictionary<ChainState<T>, Dictionary<T, int>>();
         private readonly Dictionary<ChainState<T>, int> terminals = new Dictionary<ChainState<T>, int>();
 
+        /// <summary>
+        /// Initializes a new instance of the ChainGenerator class.
+        /// </summary>
+        /// <param name="order">Indicates the desired order of the <see cref="ChainGenerator"/>.</param>
+        /// <remarks>
+        /// <para>The <paramref name="order"/> of a generator indicates the depth of its internal state.  A generator
+        /// with an order of 1 will choose items based on the previous item, a generator with an order of 2
+        /// will choose items based on the previous 2 items, and so on.</para>
+        /// <para>Zero is not classically a valid order value, but it is allowed here.  Choosing a zero value has the
+        /// effect that every state is equivalent to the starting state, and so items will be chosen based on their
+        /// total frequency.</para>
+        /// </remarks>
         public ChainGenerator(int order)
         {
-            if (order <= 0)
+            if (order < 0)
             {
                 throw new ArgumentOutOfRangeException("order");
             }
@@ -46,6 +58,20 @@ namespace Markov
             this.order = order;
         }
 
+        /// <summary>
+        /// Adds the items to the generator with a weight of one.
+        /// </summary>
+        /// <param name="items">The items to add to the generator.</param>
+        public void Add(IEnumerable<T> items)
+        {
+            this.Add(items, 1);
+        }
+
+        /// <summary>
+        /// Adds the items to the generator with the weight specified.
+        /// </summary>
+        /// <param name="items">The items to add to the generator.</param>
+        /// <param name="weight">The weight at which to add the items.</param>
         public void Add(IEnumerable<T> items, int weight)
         {
             Queue<T> previous = new Queue<T>();

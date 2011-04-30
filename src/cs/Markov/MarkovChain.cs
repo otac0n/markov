@@ -103,6 +103,30 @@ namespace Markov
                 : weight;
         }
 
+        public Dictionary<T, int> GetInitialStates()
+        {
+            var startState = new ChainState<T>(new T[0]);
+
+            Dictionary<T, int> weights;
+            if (this.items.TryGetValue(startState, out weights))
+            {
+                return new Dictionary<T, int>(weights);
+            }
+
+            return null;
+        }
+
+        public Dictionary<T, int> GetNextStates(ChainState<T> state)
+        {
+            Dictionary<T, int> weights;
+            if (this.items.TryGetValue(state, out weights))
+            {
+                return new Dictionary<T, int>(weights);
+            }
+
+            return null;
+        }
+
         public IEnumerable<T> Chain()
         {
             return this.Chain(new Random());

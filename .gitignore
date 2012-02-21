@@ -23,3 +23,6 @@ Thumbs.db
 # Ignore all Test Suite status files.
 TestResult.xml
 *.VisualState.xml
+
+# Ignore NuGet files in the root.
+/*.nupkg

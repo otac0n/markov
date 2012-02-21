@@ -1,0 +1,1 @@
+NuGet.exe pack "src\cs\Markov\Markov.csproj"  -Build -Symbols -Properties Configuration=Release

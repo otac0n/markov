@@ -79,16 +79,7 @@ namespace Markov
             {
                 var key = new ChainState<T>(previous);
 
-                Dictionary<T, int> weights;
-                if (!this.items.TryGetValue(key, out weights))
-                {
-                    weights = new Dictionary<T, int>();
-                    this.items.Add(key, weights);
-                }
-
-                weights[item] = weights.ContainsKey(item)
-                    ? weight + weights[item]
-                    : weight;
+                this.Add(key, item, weight);
 
                 previous.Enqueue(item);
                 if (previous.Count > this.order)
@@ -100,6 +91,25 @@ namespace Markov
             var terminalKey = new ChainState<T>(previous);
             this.terminals[terminalKey] = this.terminals.ContainsKey(terminalKey)
                 ? weight + this.terminals[terminalKey]
+                : weight;
+        }
+
+        public void Add(ChainState<T> state, T next)
+        {
+            this.Add(state, next, 1);
+        }
+
+        public void Add(ChainState<T> state, T next, int weight)
+        {
+            Dictionary<T, int> weights;
+            if (!this.items.TryGetValue(state, out weights))
+            {
+                weights = new Dictionary<T, int>();
+                this.items.Add(state, weights);
+            }
+
+            weights[next] = weights.ContainsKey(next)
+                ? weight + weights[next]
                 : weight;
         }
 

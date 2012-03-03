@@ -28,6 +28,7 @@ namespace Markov
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Security.Cryptography;
 
     public class MarkovChain<T> where T : IEquatable<T>
     {
@@ -152,7 +153,7 @@ namespace Markov
             return this.Chain(new RandomWrapper(rand));
         }
 
-        public IEnumerable<T> Chain(System.Security.Cryptography.RandomNumberGenerator rand)
+        public IEnumerable<T> Chain(RandomNumberGenerator rand)
         {
             return this.Chain(new RandomNumberGeneratorWrapper(rand));
         }

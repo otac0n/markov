@@ -95,11 +95,70 @@ namespace Markov
                 : weight;
         }
 
+        /// <summary>
+        /// Adds the item to the generator, with the specified items preceding it.
+        /// </summary>
+        /// <param name="previous">The items preceding the item.</param>
+        /// <param name="item">The item to add.</param>
+        /// <remarks>
+        /// See <see cref="Markov.MarkovChain.Add(IEnumerable<T>, T, int)"/> for remarks.
+        /// </remarks>
+        public void Add(IEnumerable<T> previous, T item)
+        {
+            var state = new Queue<T>(previous);
+            while (state.Count > this.order)
+            {
+                state.Dequeue();
+            }
+
+            this.Add(new ChainState<T>(state), item, 1);
+        }
+
+        /// <summary>
+        /// Adds the item to the generator, with the specified state preceding it.
+        /// </summary>
+        /// <param name="previous">The state preceding the item.</param>
+        /// <param name="next">The item to add.</param>
+        /// <remarks>
+        /// See <see cref="Markov.MarkovChain.Add(ChainState<T>, T, int)"/> for remarks.
+        /// </remarks>
         public void Add(ChainState<T> state, T next)
         {
             this.Add(state, next, 1);
         }
 
+        /// <summary>
+        /// Adds the item to the generator, with the specified items preceding it and the specified weight.
+        /// </summary>
+        /// <param name="previous">The items preceding the item.</param>
+        /// <param name="item">The item to add.</param>
+        /// <param name="weight">The weight of the item to add.</param>
+        /// <remarks>
+        /// This method does not add all of the preceding states to the generator.
+        /// Notably, the empty state is not added, unless the <paramref name="previous"/> parameter is empty.
+        /// </remarks>
+        public void Add(IEnumerable<T> previous, T item, int weight)
+        {
+            var state = new Queue<T>(previous);
+            while (state.Count > this.order)
+            {
+                state.Dequeue();
+            }
+
+            this.Add(new ChainState<T>(state), item, weight);
+        }
+
+        /// <summary>
+        /// Adds the item to the generator, with the specified state preceding it and the specified weight.
+        /// </summary>
+        /// <param name="previous">The state preceding the item.</param>
+        /// <param name="next">The item to add.</param>
+        /// <param name="weight">The weight of the item to add.</param>
+        /// <remarks>
+        /// This adds the state as-is.  The state may not be reachable if, for example, the
+        /// number of items in the state is greater than the order of the generator, or if the
+        /// combination of items is not available in the other states of the generator.
+        /// </remarks>
         public void Add(ChainState<T> state, T next, int weight)
         {
             Dictionary<T, int> weights;
@@ -114,6 +173,10 @@ namespace Markov
                 : weight;
         }
 
+        /// <summary>
+        /// Gets the items from the generator that follow from an empty state.
+        /// </summary>
+        /// <returns>A dictionary of the items and their weight.</returns>
         public Dictionary<T, int> GetInitialStates()
         {
             var startState = new ChainState<T>(Enumerable.Empty<T>());
@@ -127,6 +190,27 @@ namespace Markov
             return null;
         }
 
+        /// <summary>
+        /// Gets the items from the generator that follow from the specified items preceding it.
+        /// </summary>
+        /// <param name="previous">The items preceding the items of interest.</param>
+        /// <returns>A dictionary of the items and their weight.</returns>
+        public Dictionary<T, int> GetNextStates(IEnumerable<T> previous)
+        {
+            var state = new Queue<T>(previous);
+            while (state.Count > this.order)
+            {
+                state.Dequeue();
+            }
+
+            return this.GetNextStates(new ChainState<T>(state));
+        }
+
+        /// <summary>
+        /// Gets the items from the generator that follow from the specified state preceding it.
+        /// </summary>
+        /// <param name="state">The state preceding the items of interest.</param>
+        /// <returns>A dictionary of the items and their weight.</returns>
         public Dictionary<T, int> GetNextStates(ChainState<T> state)
         {
             Dictionary<T, int> weights;

@@ -77,7 +77,7 @@ namespace Markov
             Queue<T> previous = new Queue<T>();
             foreach (var item in items)
             {
-                var key = new ChainState<T>(previous.ToArray());
+                var key = new ChainState<T>(previous);
 
                 Dictionary<T, int> weights;
                 if (!this.items.TryGetValue(key, out weights))
@@ -97,7 +97,7 @@ namespace Markov
                 }
             }
 
-            var terminalKey = new ChainState<T>(previous.ToArray());
+            var terminalKey = new ChainState<T>(previous);
             this.terminals[terminalKey] = this.terminals.ContainsKey(terminalKey)
                 ? weight + this.terminals[terminalKey]
                 : weight;
@@ -105,7 +105,7 @@ namespace Markov
 
         public Dictionary<T, int> GetInitialStates()
         {
-            var startState = new ChainState<T>(new T[0]);
+            var startState = new ChainState<T>(Enumerable.Empty<T>());
 
             Dictionary<T, int> weights;
             if (this.items.TryGetValue(startState, out weights))

@@ -26,10 +26,22 @@
 namespace Markov
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
 
     public class ChainState<T> : IEquatable<ChainState<T>>
     {
         private readonly T[] items;
+
+        public ChainState(IEnumerable<T> items)
+        {
+            if (items == null)
+            {
+                throw new ArgumentNullException("items");
+            }
+
+            this.items = items.ToArray();
+        }
 
         public ChainState(T[] items)
         {
@@ -38,7 +50,8 @@ namespace Markov
                 throw new ArgumentNullException("items");
             }
 
-            this.items = items;
+            this.items = new T[items.Length];
+            Array.Copy(items, this.items, items.Length);
         }
 
         public static bool operator ==(ChainState<T> a, ChainState<T> b)

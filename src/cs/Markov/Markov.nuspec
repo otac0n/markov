@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>https://raw.github.com/otac0n/markov/master/README</licenseUrl>
+    <projectUrl>https://github.com/otac0n/markov</projectUrl>
+    <iconUrl>https://raw.github.com/otac0n/markov/master/media/Markov.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>Copyright © 2011 John Gietzen</copyright>
+  </metadata>
+</package>

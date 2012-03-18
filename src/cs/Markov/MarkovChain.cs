@@ -40,7 +40,7 @@ namespace Markov
         /// <summary>
         /// Initializes a new instance of the MarkovChain class.
         /// </summary>
-        /// <param name="order">Indicates the desired order of the <see cref="MarkovChain"/>.</param>
+        /// <param name="order">Indicates the desired order of the <see cref="Markov.MarkovChain&lt;T&gt;"/>.</param>
         /// <remarks>
         /// <para>The <paramref name="order"/> of a generator indicates the depth of its internal state.  A generator
         /// with an order of 1 will choose items based on the previous item, a generator with an order of 2
@@ -101,7 +101,7 @@ namespace Markov
         /// <param name="previous">The items preceding the item.</param>
         /// <param name="item">The item to add.</param>
         /// <remarks>
-        /// See <see cref="Markov.MarkovChain.Add(IEnumerable<T>, T, int)"/> for remarks.
+        /// See <see cref="Markov.MarkovChain&lt;T&gt;.Add(IEnumerable&lt;T&gt;, T, int)"/> for remarks.
         /// </remarks>
         public void Add(IEnumerable<T> previous, T item)
         {
@@ -117,10 +117,10 @@ namespace Markov
         /// <summary>
         /// Adds the item to the generator, with the specified state preceding it.
         /// </summary>
-        /// <param name="previous">The state preceding the item.</param>
+        /// <param name="state">The state preceding the item.</param>
         /// <param name="next">The item to add.</param>
         /// <remarks>
-        /// See <see cref="Markov.MarkovChain.Add(ChainState<T>, T, int)"/> for remarks.
+        /// See <see cref="Markov.MarkovChain&lt;T&gt;.Add(ChainState&lt;T&gt;, T, int)"/> for remarks.
         /// </remarks>
         public void Add(ChainState<T> state, T next)
         {
@@ -151,7 +151,7 @@ namespace Markov
         /// <summary>
         /// Adds the item to the generator, with the specified state preceding it and the specified weight.
         /// </summary>
-        /// <param name="previous">The state preceding the item.</param>
+        /// <param name="state">The state preceding the item.</param>
         /// <param name="next">The item to add.</param>
         /// <param name="weight">The weight of the item to add.</param>
         /// <remarks>
@@ -225,7 +225,7 @@ namespace Markov
         /// <summary>
         /// Randomly walks the chain.
         /// </summary>
-        /// <returns>An <see cref="IEnumerable<T>"/> of the items chosen</returns>
+        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
         /// <remarks>Assumes an empty starting state.</remarks>
         public IEnumerable<T> Chain()
         {
@@ -236,7 +236,7 @@ namespace Markov
         /// Randomly walks the chain.
         /// </summary>
         /// <param name="previous">The items preceding the first item in the chain.</param>
-        /// <returns>An <see cref="IEnumerable<T>"/> of the items chosen</returns>
+        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
         public IEnumerable<T> Chain(IEnumerable<T> previous)
         {
             return this.Chain(previous, new RandomWrapper(new Random()));
@@ -246,7 +246,7 @@ namespace Markov
         /// Randomly walks the chain.
         /// </summary>
         /// <param name="seed">The seed for the random number generator, used as the random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable<T>"/> of the items chosen</returns>
+        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
         /// <remarks>Assumes an empty starting state.</remarks>
         public IEnumerable<T> Chain(int seed)
         {
@@ -258,7 +258,7 @@ namespace Markov
         /// </summary>
         /// <param name="previous">The items preceding the first item in the chain.</param>
         /// <param name="seed">The seed for the random number generator, used as the random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable<T>"/> of the items chosen</returns>
+        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
         public IEnumerable<T> Chain(IEnumerable<T> previous, int seed)
         {
             return this.Chain(previous, new RandomWrapper(new Random(seed)));
@@ -268,7 +268,7 @@ namespace Markov
         /// Randomly walks the chain.
         /// </summary>
         /// <param name="rand">The random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable<T>"/> of the items chosen</returns>
+        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
         /// <remarks>Assumes an empty starting state.</remarks>
         public IEnumerable<T> Chain(Random rand)
         {
@@ -280,7 +280,7 @@ namespace Markov
         /// </summary>
         /// <param name="previous">The items preceding the first item in the chain.</param>
         /// <param name="rand">The random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable<T>"/> of the items chosen</returns>
+        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
         public IEnumerable<T> Chain(IEnumerable<T> previous, Random rand)
         {
             return this.Chain(previous, new RandomWrapper(rand));
@@ -290,7 +290,7 @@ namespace Markov
         /// Randomly walks the chain.
         /// </summary>
         /// <param name="rand">The random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable<T>"/> of the items chosen</returns>
+        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
         /// <remarks>Assumes an empty starting state.</remarks>
         public IEnumerable<T> Chain(RandomNumberGenerator rand)
         {
@@ -302,7 +302,7 @@ namespace Markov
         /// </summary>
         /// <param name="previous">The items preceding the first item in the chain.</param>
         /// <param name="rand">The random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable<T>"/> of the items chosen</returns>
+        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
         public IEnumerable<T> Chain(IEnumerable<T> previous, RandomNumberGenerator rand)
         {
             return this.Chain(previous, new RandomNumberGeneratorWrapper(rand));
@@ -312,7 +312,7 @@ namespace Markov
         /// Randomly walks the chain.
         /// </summary>
         /// <param name="rand">The random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable<T>"/> of the items chosen</returns>
+        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
         /// <remarks>Assumes an empty starting state.</remarks>
         public IEnumerable<T> Chain(IRandom rand)
         {
@@ -324,7 +324,7 @@ namespace Markov
         /// </summary>
         /// <param name="previous">The items preceding the first item in the chain.</param>
         /// <param name="rand">The random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable<T>"/> of the items chosen</returns>
+        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
         public IEnumerable<T> Chain(IEnumerable<T> previous, IRandom rand)
         {
             Queue<T> state = new Queue<T>(previous);

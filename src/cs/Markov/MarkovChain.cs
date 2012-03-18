@@ -30,6 +30,10 @@ namespace Markov
     using System.Linq;
     using System.Security.Cryptography;
 
+    /// <summary>
+    /// Builds and walks interconnected states based on a weighted probability.
+    /// </summary>
+    /// <typeparam name="T">The type of the constituent parts of each state in the Markov chain.</typeparam>
     public class MarkovChain<T> where T : IEquatable<T>
     {
         private readonly int order;

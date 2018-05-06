@@ -124,11 +124,11 @@ namespace Markov
         /// <returns>A 32-bit signed integer hash code.</returns>
         public override int GetHashCode()
         {
-            var code = this.items.Length.GetHashCode();
+            var code = this.items.Length;
 
             for (var i = 0; i < this.items.Length; i++)
             {
-                code ^= this.items[i].GetHashCode();
+                code = (code * 37) + this.items[i].GetHashCode();
             }
 
             return code;

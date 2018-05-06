@@ -32,7 +32,7 @@ namespace Markov
         /// Initializes a new instance of the <see cref="ChainState{T}"/> class with the specified items.
         /// </summary>
         /// <param name="items">An array of <typeparamref name="T"/> items to be copied as a single state.</param>
-        public ChainState(T[] items)
+        public ChainState(params T[] items)
         {
             if (items == null)
             {
@@ -66,8 +66,7 @@ namespace Markov
             {
                 return true;
             }
-
-            if (((object)a == null) || ((object)b == null))
+            else if (a is null || b is null)
             {
                 return false;
             }
@@ -75,19 +74,15 @@ namespace Markov
             return a.Equals(b);
         }
 
-        /// <summary>
-        /// Determines whether the specified <see cref="object"/> is equal to the current <see cref="object"/>.
-        /// </summary>
-        /// <param name="obj">The <see cref="object"/> to compare with the current <see cref="object"/>.</param>
-        /// <returns>true if the specified <see cref="object"/> is equal to the current <see cref="object"/>; otherwise, false.</returns>
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (obj is ChainState<T> chain)
             {
-                return false;
+                return this.Equals(chain);
             }
 
-            return this.Equals(obj as ChainState<T>);
+            return false;
         }
 
         /// <summary>
@@ -97,7 +92,7 @@ namespace Markov
         /// <returns>true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.</returns>
         public bool Equals(ChainState<T> other)
         {
-            if ((object)other == null)
+            if (other is null)
             {
                 return false;
             }
@@ -118,10 +113,7 @@ namespace Markov
             return true;
         }
 
-        /// <summary>
-        /// Returns the hash code for this instance.
-        /// </summary>
-        /// <returns>A 32-bit signed integer hash code.</returns>
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var code = this.items.Length;

@@ -1,27 +1,4 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="ChainState.cs" company="(none)">
-//  Copyright © 2011 John Gietzen.
-//
-//  Permission is hereby granted, free of charge, to any person obtaining a copy
-//  of this software and associated documentation files (the "Software"), to deal
-//  in the Software without restriction, including without limitation the rights
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//  copies of the Software, and to permit persons to whom the Software is
-//  furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-//  THE SOFTWARE.
-// </copyright>
-// <author>John Gietzen</author>
-//-----------------------------------------------------------------------
+// Copyright © John Gietzen. All Rights Reserved. This source is subject to the MIT license. Please see license.md for more information.
 
 namespace Markov
 {
@@ -38,28 +15,28 @@ namespace Markov
         private readonly T[] items;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ChainState&lt;T&gt;"/> class with the specified items.
+        /// Initializes a new instance of the <see cref="ChainState{T}"/> class with the specified items.
         /// </summary>
-        /// <param name="items">An <see cref="IEnumerable&lt;T&gt;"/> of items to be copied as a single state.</param>
+        /// <param name="items">An <see cref="IEnumerable{T}"/> of items to be copied as a single state.</param>
         public ChainState(IEnumerable<T> items)
         {
             if (items == null)
             {
-                throw new ArgumentNullException("items");
+                throw new ArgumentNullException(nameof(items));
             }
 
             this.items = items.ToArray();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ChainState&lt;T&gt;"/> class with the specified items.
+        /// Initializes a new instance of the <see cref="ChainState{T}"/> class with the specified items.
         /// </summary>
-        /// <param name="items">A <see cref="T:T[]"/> of items to be copied as a single state.</param>
+        /// <param name="items">An array of <typeparamref name="T"/> items to be copied as a single state.</param>
         public ChainState(T[] items)
         {
             if (items == null)
             {
-                throw new ArgumentNullException("items");
+                throw new ArgumentNullException(nameof(items));
             }
 
             this.items = new T[items.Length];
@@ -67,10 +44,21 @@ namespace Markov
         }
 
         /// <summary>
-        /// Determines whether two specified instances of <see cref="ChainState&lt;T&gt;"/> are equal.
+        /// Determines whether two specified instances of <see cref="ChainState{T}"/> are not equal.
         /// </summary>
-        /// <param name="a">A <see cref="ChainState&lt;T&gt;"/>.</param>
-        /// <param name="b">A <see cref="ChainState&lt;T&gt;"/>.</param>
+        /// <param name="a">The first <see cref="ChainState{T}"/> to compare.</param>
+        /// <param name="b">The second <see cref="ChainState{T}"/> to compare.</param>
+        /// <returns>true if <paramref name="a"/> and <paramref name="b"/> do not represent the same state; otherwise, false.</returns>
+        public static bool operator !=(ChainState<T> a, ChainState<T> b)
+        {
+            return !(a == b);
+        }
+
+        /// <summary>
+        /// Determines whether two specified instances of <see cref="ChainState{T}"/> are equal.
+        /// </summary>
+        /// <param name="a">The first <see cref="ChainState{T}"/> to compare.</param>
+        /// <param name="b">The second <see cref="ChainState{T}"/> to compare.</param>
         /// <returns>true if <paramref name="a"/> and <paramref name="b"/> represent the same state; otherwise, false.</returns>
         public static bool operator ==(ChainState<T> a, ChainState<T> b)
         {
@@ -85,33 +73,6 @@ namespace Markov
             }
 
             return a.Equals(b);
-        }
-
-        /// <summary>
-        /// Determines whether two specified instances of <see cref="ChainState&lt;T&gt;"/> are not equal.
-        /// </summary>
-        /// <param name="a">A <see cref="ChainState&lt;T&gt;"/>.</param>
-        /// <param name="b">A <see cref="ChainState&lt;T&gt;"/>.</param>
-        /// <returns>true if <paramref name="a"/> and <paramref name="b"/> do not represent the same state; otherwise, false.</returns>
-        public static bool operator !=(ChainState<T> a, ChainState<T> b)
-        {
-            return !(a == b);
-        }
-
-        /// <summary>
-        /// Returns the hash code for this instance.
-        /// </summary>
-        /// <returns>A 32-bit signed integer hash code.</returns>
-        public override int GetHashCode()
-        {
-            var code = this.items.Length.GetHashCode();
-
-            for (int i = 0; i < this.items.Length; i++)
-            {
-                code ^= this.items[i].GetHashCode();
-            }
-
-            return code;
         }
 
         /// <summary>
@@ -146,7 +107,7 @@ namespace Markov
                 return false;
             }
 
-            for (int i = 0; i < this.items.Length; i++)
+            for (var i = 0; i < this.items.Length; i++)
             {
                 if (!this.items[i].Equals(other.items[i]))
                 {
@@ -155,6 +116,22 @@ namespace Markov
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Returns the hash code for this instance.
+        /// </summary>
+        /// <returns>A 32-bit signed integer hash code.</returns>
+        public override int GetHashCode()
+        {
+            var code = this.items.Length.GetHashCode();
+
+            for (var i = 0; i < this.items.Length; i++)
+            {
+                code ^= this.items[i].GetHashCode();
+            }
+
+            return code;
         }
     }
 }

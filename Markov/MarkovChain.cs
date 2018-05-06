@@ -1,27 +1,4 @@
-﻿//-----------------------------------------------------------------------
-// <copyright file="MarkovChain.cs" company="(none)">
-//  Copyright © 2011 John Gietzen.
-//
-//  Permission is hereby granted, free of charge, to any person obtaining a copy
-//  of this software and associated documentation files (the "Software"), to deal
-//  in the Software without restriction, including without limitation the rights
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//  copies of the Software, and to permit persons to whom the Software is
-//  furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in
-//  all copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-//  THE SOFTWARE.
-// </copyright>
-// <author>John Gietzen</author>
-//-----------------------------------------------------------------------
+// Copyright © John Gietzen. All Rights Reserved. This source is subject to the MIT license. Please see license.md for more information.
 
 namespace Markov
 {
@@ -34,17 +11,17 @@ namespace Markov
     /// Builds and walks interconnected states based on a weighted probability.
     /// </summary>
     /// <typeparam name="T">The type of the constituent parts of each state in the Markov chain.</typeparam>
-    public class MarkovChain<T> where T : IEquatable<T>
+    public class MarkovChain<T>
+        where T : IEquatable<T>
     {
-        private readonly int order;
-
         private readonly Dictionary<ChainState<T>, Dictionary<T, int>> items = new Dictionary<ChainState<T>, Dictionary<T, int>>();
+        private readonly int order;
         private readonly Dictionary<ChainState<T>, int> terminals = new Dictionary<ChainState<T>, int>();
 
         /// <summary>
-        /// Initializes a new instance of the MarkovChain class.
+        /// Initializes a new instance of the <see cref="MarkovChain{T}"/> class.
         /// </summary>
-        /// <param name="order">Indicates the desired order of the <see cref="Markov.MarkovChain&lt;T&gt;"/>.</param>
+        /// <param name="order">Indicates the desired order of the <see cref="MarkovChain{T}"/>.</param>
         /// <remarks>
         /// <para>The <paramref name="order"/> of a generator indicates the depth of its internal state.  A generator
         /// with an order of 1 will choose items based on the previous item, a generator with an order of 2
@@ -57,7 +34,7 @@ namespace Markov
         {
             if (order < 0)
             {
-                throw new ArgumentOutOfRangeException("order");
+                throw new ArgumentOutOfRangeException(nameof(order));
             }
 
             this.order = order;
@@ -67,10 +44,7 @@ namespace Markov
         /// Adds the items to the generator with a weight of one.
         /// </summary>
         /// <param name="items">The items to add to the generator.</param>
-        public void Add(IEnumerable<T> items)
-        {
-            this.Add(items, 1);
-        }
+        public void Add(IEnumerable<T> items) => this.Add(items, 1);
 
         /// <summary>
         /// Adds the items to the generator with the weight specified.
@@ -79,7 +53,7 @@ namespace Markov
         /// <param name="weight">The weight at which to add the items.</param>
         public void Add(IEnumerable<T> items, int weight)
         {
-            Queue<T> previous = new Queue<T>();
+            var previous = new Queue<T>();
             foreach (var item in items)
             {
                 var key = new ChainState<T>(previous);
@@ -105,7 +79,7 @@ namespace Markov
         /// <param name="previous">The items preceding the item.</param>
         /// <param name="item">The item to add.</param>
         /// <remarks>
-        /// See <see cref="Markov.MarkovChain&lt;T&gt;.Add(IEnumerable&lt;T&gt;, T, int)"/> for remarks.
+        /// See <see cref="MarkovChain{T}.Add(IEnumerable{T}, T, int)"/> for remarks.
         /// </remarks>
         public void Add(IEnumerable<T> previous, T item)
         {
@@ -124,12 +98,9 @@ namespace Markov
         /// <param name="state">The state preceding the item.</param>
         /// <param name="next">The item to add.</param>
         /// <remarks>
-        /// See <see cref="Markov.MarkovChain&lt;T&gt;.Add(ChainState&lt;T&gt;, T, int)"/> for remarks.
+        /// See <see cref="MarkovChain{T}.Add(ChainState{T}, T, int)"/> for remarks.
         /// </remarks>
-        public void Add(ChainState<T> state, T next)
-        {
-            this.Add(state, next, 1);
-        }
+        public void Add(ChainState<T> state, T next) => this.Add(state, next, 1);
 
         /// <summary>
         /// Adds the item to the generator, with the specified items preceding it and the specified weight.
@@ -165,8 +136,7 @@ namespace Markov
         /// </remarks>
         public void Add(ChainState<T> state, T next, int weight)
         {
-            Dictionary<T, int> weights;
-            if (!this.items.TryGetValue(state, out weights))
+            if (!this.items.TryGetValue(state, out var weights))
             {
                 weights = new Dictionary<T, int>();
                 this.items.Add(state, weights);
@@ -178,6 +148,123 @@ namespace Markov
         }
 
         /// <summary>
+        /// Randomly walks the chain.
+        /// </summary>
+        /// <returns>An <see cref="IEnumerable{T}"/> of the items chosen.</returns>
+        /// <remarks>Assumes an empty starting state.</remarks>
+        public IEnumerable<T> Chain() => this.Chain(Enumerable.Empty<T>(), new RandomWrapper(new Random()));
+
+        /// <summary>
+        /// Randomly walks the chain.
+        /// </summary>
+        /// <param name="previous">The items preceding the first item in the chain.</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> of the items chosen.</returns>
+        public IEnumerable<T> Chain(IEnumerable<T> previous) => this.Chain(previous, new RandomWrapper(new Random()));
+
+        /// <summary>
+        /// Randomly walks the chain.
+        /// </summary>
+        /// <param name="seed">The seed for the random number generator, used as the random number source for the chain.</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> of the items chosen.</returns>
+        /// <remarks>Assumes an empty starting state.</remarks>
+        public IEnumerable<T> Chain(int seed) => this.Chain(Enumerable.Empty<T>(), new RandomWrapper(new Random(seed)));
+
+        /// <summary>
+        /// Randomly walks the chain.
+        /// </summary>
+        /// <param name="previous">The items preceding the first item in the chain.</param>
+        /// <param name="seed">The seed for the random number generator, used as the random number source for the chain.</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> of the items chosen.</returns>
+        public IEnumerable<T> Chain(IEnumerable<T> previous, int seed) => this.Chain(previous, new RandomWrapper(new Random(seed)));
+
+        /// <summary>
+        /// Randomly walks the chain.
+        /// </summary>
+        /// <param name="rand">The random number source for the chain.</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> of the items chosen.</returns>
+        /// <remarks>Assumes an empty starting state.</remarks>
+        public IEnumerable<T> Chain(Random rand) => this.Chain(Enumerable.Empty<T>(), new RandomWrapper(rand));
+
+        /// <summary>
+        /// Randomly walks the chain.
+        /// </summary>
+        /// <param name="previous">The items preceding the first item in the chain.</param>
+        /// <param name="rand">The random number source for the chain.</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> of the items chosen.</returns>
+        public IEnumerable<T> Chain(IEnumerable<T> previous, Random rand) => this.Chain(previous, new RandomWrapper(rand));
+
+        /// <summary>
+        /// Randomly walks the chain.
+        /// </summary>
+        /// <param name="rand">The random number source for the chain.</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> of the items chosen.</returns>
+        /// <remarks>Assumes an empty starting state.</remarks>
+        public IEnumerable<T> Chain(RandomNumberGenerator rand) => this.Chain(Enumerable.Empty<T>(), new RandomNumberGeneratorWrapper(rand));
+
+        /// <summary>
+        /// Randomly walks the chain.
+        /// </summary>
+        /// <param name="previous">The items preceding the first item in the chain.</param>
+        /// <param name="rand">The random number source for the chain.</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> of the items chosen.</returns>
+        public IEnumerable<T> Chain(IEnumerable<T> previous, RandomNumberGenerator rand) => this.Chain(previous, new RandomNumberGeneratorWrapper(rand));
+
+        /// <summary>
+        /// Randomly walks the chain.
+        /// </summary>
+        /// <param name="rand">The random number source for the chain.</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> of the items chosen.</returns>
+        /// <remarks>Assumes an empty starting state.</remarks>
+        public IEnumerable<T> Chain(IRandom rand) => this.Chain(Enumerable.Empty<T>(), rand);
+
+        /// <summary>
+        /// Randomly walks the chain.
+        /// </summary>
+        /// <param name="previous">The items preceding the first item in the chain.</param>
+        /// <param name="rand">The random number source for the chain.</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> of the items chosen.</returns>
+        public IEnumerable<T> Chain(IEnumerable<T> previous, IRandom rand)
+        {
+            var state = new Queue<T>(previous);
+            while (true)
+            {
+                while (state.Count > this.order)
+                {
+                    state.Dequeue();
+                }
+
+                var key = new ChainState<T>(state);
+
+                if (!this.items.TryGetValue(key, out var weights))
+                {
+                    yield break;
+                }
+
+                this.terminals.TryGetValue(key, out var terminalWeight);
+
+                var total = weights.Sum(w => w.Value);
+                var value = rand.Next(total + terminalWeight) + 1;
+
+                if (value > total)
+                {
+                    yield break;
+                }
+
+                var currentWeight = 0;
+                foreach (var nextItem in weights)
+                {
+                    currentWeight += nextItem.Value;
+                    if (currentWeight >= value)
+                    {
+                        yield return nextItem.Key;
+                        state.Enqueue(nextItem.Key);
+                        break;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets the items from the generator that follow from an empty state.
         /// </summary>
         /// <returns>A dictionary of the items and their weight.</returns>
@@ -185,8 +272,7 @@ namespace Markov
         {
             var startState = new ChainState<T>(Enumerable.Empty<T>());
 
-            Dictionary<T, int> weights;
-            if (this.items.TryGetValue(startState, out weights))
+            if (this.items.TryGetValue(startState, out var weights))
             {
                 return new Dictionary<T, int>(weights);
             }
@@ -217,159 +303,12 @@ namespace Markov
         /// <returns>A dictionary of the items and their weight.</returns>
         public Dictionary<T, int> GetNextStates(ChainState<T> state)
         {
-            Dictionary<T, int> weights;
-            if (this.items.TryGetValue(state, out weights))
+            if (this.items.TryGetValue(state, out var weights))
             {
                 return new Dictionary<T, int>(weights);
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// Randomly walks the chain.
-        /// </summary>
-        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
-        /// <remarks>Assumes an empty starting state.</remarks>
-        public IEnumerable<T> Chain()
-        {
-            return this.Chain(Enumerable.Empty<T>(), new RandomWrapper(new Random()));
-        }
-
-        /// <summary>
-        /// Randomly walks the chain.
-        /// </summary>
-        /// <param name="previous">The items preceding the first item in the chain.</param>
-        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
-        public IEnumerable<T> Chain(IEnumerable<T> previous)
-        {
-            return this.Chain(previous, new RandomWrapper(new Random()));
-        }
-
-        /// <summary>
-        /// Randomly walks the chain.
-        /// </summary>
-        /// <param name="seed">The seed for the random number generator, used as the random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
-        /// <remarks>Assumes an empty starting state.</remarks>
-        public IEnumerable<T> Chain(int seed)
-        {
-            return this.Chain(Enumerable.Empty<T>(), new RandomWrapper(new Random(seed)));
-        }
-
-        /// <summary>
-        /// Randomly walks the chain.
-        /// </summary>
-        /// <param name="previous">The items preceding the first item in the chain.</param>
-        /// <param name="seed">The seed for the random number generator, used as the random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
-        public IEnumerable<T> Chain(IEnumerable<T> previous, int seed)
-        {
-            return this.Chain(previous, new RandomWrapper(new Random(seed)));
-        }
-
-        /// <summary>
-        /// Randomly walks the chain.
-        /// </summary>
-        /// <param name="rand">The random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
-        /// <remarks>Assumes an empty starting state.</remarks>
-        public IEnumerable<T> Chain(Random rand)
-        {
-            return this.Chain(Enumerable.Empty<T>(), new RandomWrapper(rand));
-        }
-
-        /// <summary>
-        /// Randomly walks the chain.
-        /// </summary>
-        /// <param name="previous">The items preceding the first item in the chain.</param>
-        /// <param name="rand">The random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
-        public IEnumerable<T> Chain(IEnumerable<T> previous, Random rand)
-        {
-            return this.Chain(previous, new RandomWrapper(rand));
-        }
-
-        /// <summary>
-        /// Randomly walks the chain.
-        /// </summary>
-        /// <param name="rand">The random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
-        /// <remarks>Assumes an empty starting state.</remarks>
-        public IEnumerable<T> Chain(RandomNumberGenerator rand)
-        {
-            return this.Chain(Enumerable.Empty<T>(), new RandomNumberGeneratorWrapper(rand));
-        }
-
-        /// <summary>
-        /// Randomly walks the chain.
-        /// </summary>
-        /// <param name="previous">The items preceding the first item in the chain.</param>
-        /// <param name="rand">The random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
-        public IEnumerable<T> Chain(IEnumerable<T> previous, RandomNumberGenerator rand)
-        {
-            return this.Chain(previous, new RandomNumberGeneratorWrapper(rand));
-        }
-
-        /// <summary>
-        /// Randomly walks the chain.
-        /// </summary>
-        /// <param name="rand">The random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
-        /// <remarks>Assumes an empty starting state.</remarks>
-        public IEnumerable<T> Chain(IRandom rand)
-        {
-            return this.Chain(Enumerable.Empty<T>(), rand);
-        }
-
-        /// <summary>
-        /// Randomly walks the chain.
-        /// </summary>
-        /// <param name="previous">The items preceding the first item in the chain.</param>
-        /// <param name="rand">The random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable&lt;T&gt;"/> of the items chosen.</returns>
-        public IEnumerable<T> Chain(IEnumerable<T> previous, IRandom rand)
-        {
-            Queue<T> state = new Queue<T>(previous);
-            while (true)
-            {
-                while (state.Count > this.order)
-                {
-                    state.Dequeue();
-                }
-
-                var key = new ChainState<T>(state);
-
-                Dictionary<T, int> weights;
-                if (!this.items.TryGetValue(key, out weights))
-                {
-                    yield break;
-                }
-
-                int terminalWeight;
-                this.terminals.TryGetValue(key, out terminalWeight);
-
-                var total = weights.Sum(w => w.Value);
-                var value = rand.Next(total + terminalWeight) + 1;
-
-                if (value > total)
-                {
-                    yield break;
-                }
-
-                var currentWeight = 0;
-                foreach (var nextItem in weights)
-                {
-                    currentWeight += nextItem.Value;
-                    if (currentWeight >= value)
-                    {
-                        yield return nextItem.Key;
-                        state.Enqueue(nextItem.Key);
-                        break;
-                    }
-                }
-            }
         }
     }
 }

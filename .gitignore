@@ -1,17 +1,21 @@
 # Ignore all */bin/ and */obj/ folders...
-bin/
-obj/
+[Bb]in/
+[Oo]bj/
 
 # Ignore backup files.
 *.orig
 
 # Ignore all Visual Studio generated files.
+*.sln.ide/
+.vs/
 *.suo
 *.user
 *.ncb
 _ReSharper.*
-*.Cache
-*.cache
+*.[Cc]ache
+_NCrunch*/
+*.ncrunch*
+*.docstates
 
 # Ignore all MonoDevelop generated files.
 *.userprefs
@@ -24,5 +28,5 @@ Thumbs.db
 TestResult.xml
 *.VisualState.xml
 
-# Ignore NuGet files in the root.
-/*.nupkg
+# Ignore NuGet packages (let package restore handle these)
+/packages/

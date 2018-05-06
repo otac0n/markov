@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\SharedAssemblyInfo.props" />
+  <PropertyGroup>
+    <CodeAnalysisRuleSet>Markov.ruleset</CodeAnalysisRuleSet>
+    <DebugType>Full</DebugType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <TargetFrameworks>net35;netcoreapp2.0</TargetFrameworks>
+    <Description>A Markov chain library, made to support scenarios anywhere from text generation to stock market simulation.</Description>
+    <PackageIconUrl>https://raw.github.com/otac0n/markov/master/media/Markov.png</PackageIconUrl>
+    <PackageLicenseUrl>https://raw.github.com/otac0n/markov/master/license.md</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/otac0n/markov</PackageProjectUrl>
+  </PropertyGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="..\stylecop.json" Link="stylecop.json" />
+    <AdditionalFiles Include="Markov.ruleset" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FixMe" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="GitVersionTask" Version="4.0.0-beta0012" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.0" PrivateAssets="All" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta006" PrivateAssets="All" />
+  </ItemGroup>
+</Project>

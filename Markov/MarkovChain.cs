@@ -72,9 +72,17 @@ namespace Markov
             }
 
             var terminalKey = new ChainState<T>(previous);
-            this.terminals[terminalKey] = this.terminals.ContainsKey(terminalKey)
+            var newWeight = Math.Max(0, this.terminals.ContainsKey(terminalKey)
                 ? weight + this.terminals[terminalKey]
-                : weight;
+                : weight);
+            if (newWeight == 0)
+            {
+                this.terminals.Remove(terminalKey);
+            }
+            else
+            {
+                this.terminals[terminalKey] = newWeight;
+            }
         }
 
         /// <summary>
@@ -165,9 +173,21 @@ namespace Markov
                 this.items.Add(state, weights);
             }
 
-            weights[next] = Math.Max(0, weights.ContainsKey(next)
+            var newWeight = Math.Max(0, weights.ContainsKey(next)
                 ? weight + weights[next]
                 : weight);
+            if (newWeight == 0)
+            {
+                weights.Remove(next);
+                if (weights.Count == 0)
+                {
+                    this.items.Remove(state);
+                }
+            }
+            else
+            {
+                weights[next] = newWeight;
+            }
         }
 
         /// <summary>

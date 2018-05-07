@@ -10,11 +10,20 @@ namespace Markov.Tests
 
     public class MarkovChainTests
     {
+        public static readonly string EmptySample = @"{}";
+
         public static object[][] Samples => new[]
         {
             new[] { "fool", @"{'':{'f':1},'f':{'o':1},'o':{'o':1,'l':1},'l':{'':1}}" },
             new[] { "food", @"{'':{'f':1},'f':{'o':1},'o':{'o':1,'d':1},'d':{'':1}}" },
             new[] { "loose", @"{'':{'l':1},'l':{'o':1},'o':{'o':1,'s':1},'s':{'e':1},'e':{'':1}}" },
+        };
+
+        public static object[][] SamplesNoSerialized => new[]
+        {
+            new[] { "fool" },
+            new[] { "food" },
+            new[] { "loose" },
         };
 
         [Theory]
@@ -27,6 +36,19 @@ namespace Markov.Tests
 
             var result = Serialize(chain);
             Assert.Equal(serialized, result);
+        }
+
+        [Theory]
+        [MemberData(nameof(SamplesNoSerialized))]
+        public void Add_WithOppositeWeight_ResetsInternalsToInitialState(string sample)
+        {
+            var chain = new MarkovChain<char>(1);
+            chain.Add(sample, 1);
+
+            chain.Add(sample, -1);
+
+            var result = Serialize(chain);
+            Assert.Equal(EmptySample, result);
         }
 
         [Theory]

@@ -2,6 +2,8 @@
 
 namespace Markov.Tests
 {
+    using System;
+    using System.Collections.Generic;
     using System.Linq;
     using Xunit;
 
@@ -12,6 +14,7 @@ namespace Markov.Tests
             "a",
             "ab",
             "abc",
+            "aaa",
         };
 
         public static object[][] ValuePairs =>
@@ -23,6 +26,24 @@ namespace Markov.Tests
         public static object[][] Values =>
             (from v in Samples
              select new[] { v }).ToArray();
+
+        [Fact]
+        public void Ctor_WithNullArray_ThrowsArgumentNullException()
+        {
+            char[] value = null;
+
+            Assert.Throws<ArgumentNullException>(
+                () => new ChainState<char>(value));
+        }
+
+        [Fact]
+        public void Ctor_WithNullEnumerable_ThrowsArgumentNullException()
+        {
+            IEnumerable<char> value = null;
+
+            Assert.Throws<ArgumentNullException>(
+                () => new ChainState<char>(value));
+        }
 
         [Theory]
         [MemberData(nameof(ValuePairs))]

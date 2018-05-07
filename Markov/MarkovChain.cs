@@ -52,6 +52,11 @@ namespace Markov
         /// <param name="weight">The weight at which to add the items.</param>
         public void Add(IEnumerable<T> items, int weight)
         {
+            if (items == null)
+            {
+                throw new ArgumentNullException(nameof(items));
+            }
+
             var previous = new Queue<T>();
             foreach (var item in items)
             {
@@ -82,6 +87,11 @@ namespace Markov
         /// </remarks>
         public void Add(IEnumerable<T> previous, T item)
         {
+            if (previous == null)
+            {
+                throw new ArgumentNullException(nameof(previous));
+            }
+
             var state = new Queue<T>(previous);
             while (state.Count > this.order)
             {
@@ -113,6 +123,11 @@ namespace Markov
         /// </remarks>
         public void Add(IEnumerable<T> previous, T item, int weight)
         {
+            if (previous == null)
+            {
+                throw new ArgumentNullException(nameof(previous));
+            }
+
             var state = new Queue<T>(previous);
             while (state.Count > this.order)
             {
@@ -132,18 +147,27 @@ namespace Markov
         /// This adds the state as-is.  The state may not be reachable if, for example, the
         /// number of items in the state is greater than the order of the generator, or if the
         /// combination of items is not available in the other states of the generator.
+        ///
+        /// A negative weight may be passed, which will have the impact of reducing the weight
+        /// of the specified state transition.  This can therefore be used to remove items from
+        /// the generator. The resulting weight will never be allowed below zero.
         /// </remarks>
         public void Add(ChainState<T> state, T next, int weight)
         {
+            if (state == null)
+            {
+                throw new ArgumentNullException(nameof(state));
+            }
+
             if (!this.items.TryGetValue(state, out var weights))
             {
                 weights = new Dictionary<T, int>();
                 this.items.Add(state, weights);
             }
 
-            weights[next] = weights.ContainsKey(next)
+            weights[next] = Math.Max(0, weights.ContainsKey(next)
                 ? weight + weights[next]
-                : weight;
+                : weight);
         }
 
         /// <summary>
@@ -192,6 +216,15 @@ namespace Markov
         /// <returns>An <see cref="IEnumerable{T}"/> of the items chosen.</returns>
         public IEnumerable<T> Chain(IEnumerable<T> previous, Random rand)
         {
+            if (previous == null)
+            {
+                throw new ArgumentNullException(nameof(previous));
+            }
+            else if (rand == null)
+            {
+                throw new ArgumentNullException(nameof(rand));
+            }
+
             var state = new Queue<T>(previous);
             while (true)
             {
@@ -235,17 +268,7 @@ namespace Markov
         /// Gets the items from the generator that follow from an empty state.
         /// </summary>
         /// <returns>A dictionary of the items and their weight.</returns>
-        public Dictionary<T, int> GetInitialStates()
-        {
-            var startState = new ChainState<T>(Enumerable.Empty<T>());
-
-            if (this.items.TryGetValue(startState, out var weights))
-            {
-                return new Dictionary<T, int>(weights);
-            }
-
-            return null;
-        }
+        public Dictionary<T, int> GetInitialStates() => this.GetNextStates(new ChainState<T>(Enumerable.Empty<T>()));
 
         /// <summary>
         /// Gets the items from the generator that follow from the specified items preceding it.
@@ -276,6 +299,53 @@ namespace Markov
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Gets all of the states that exist in the generator.
+        /// </summary>
+        /// <returns>An enumerable collection of <see cref="ChainState{T}"/> containing all of the states in the generator.</returns>
+        public IEnumerable<ChainState<T>> GetStates()
+        {
+            foreach (var state in this.items.Keys)
+            {
+                yield return state;
+            }
+
+            foreach (var state in this.terminals.Keys)
+            {
+                if (!this.items.ContainsKey(state))
+                {
+                    yield return state;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the weight of termination following from the specified items.
+        /// </summary>
+        /// <param name="previous">The items preceding the items of interest.</param>
+        /// <returns>A dictionary of the items and their weight.</returns>
+        public int GetTerminalWeight(IEnumerable<T> previous)
+        {
+            var state = new Queue<T>(previous);
+            while (state.Count > this.order)
+            {
+                state.Dequeue();
+            }
+
+            return this.GetTerminalWeight(new ChainState<T>(state));
+        }
+
+        /// <summary>
+        /// Gets the weights of termination following from the specified state.
+        /// </summary>
+        /// <param name="state">The state preceding the items of interest.</param>
+        /// <returns>A dictionary of the items and their weight.</returns>
+        public int GetTerminalWeight(ChainState<T> state)
+        {
+            this.terminals.TryGetValue(state, out var weight);
+            return weight;
         }
     }
 }

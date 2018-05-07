@@ -3,6 +3,7 @@
 namespace Markov
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -10,7 +11,7 @@ namespace Markov
     /// Represents a state in a Markov chain.
     /// </summary>
     /// <typeparam name="T">The type of the constituent parts of each state in the Markov chain.</typeparam>
-    public class ChainState<T> : IEquatable<ChainState<T>>
+    public class ChainState<T> : IEquatable<ChainState<T>>, IList<T>
     {
         private readonly T[] items;
 
@@ -43,6 +44,19 @@ namespace Markov
             Array.Copy(items, this.items, items.Length);
         }
 
+        /// <inheritdoc />
+        public int Count => this.items.Length;
+
+        /// <inheritdoc />
+        public bool IsReadOnly => true;
+
+        /// <inheritdoc />
+        public T this[int index]
+        {
+            get { return this.items[index]; }
+            set { throw new NotSupportedException(); }
+        }
+
         /// <summary>
         /// Determines whether two specified instances of <see cref="ChainState{T}"/> are not equal.
         /// </summary>
@@ -73,6 +87,18 @@ namespace Markov
 
             return a.Equals(b);
         }
+
+        /// <inheritdoc />
+        public void Add(T item) => throw new NotSupportedException();
+
+        /// <inheritdoc />
+        public void Clear() => throw new NotSupportedException();
+
+        /// <inheritdoc />
+        public bool Contains(T item) => ((IList<T>)this.items).Contains(item);
+
+        /// <inheritdoc />
+        public void CopyTo(T[] array, int arrayIndex) => this.items.CopyTo(array, arrayIndex);
 
         /// <inheritdoc />
         public override bool Equals(object obj)
@@ -114,6 +140,12 @@ namespace Markov
         }
 
         /// <inheritdoc />
+        public IEnumerator<T> GetEnumerator() => ((IList<T>)this.items).GetEnumerator();
+
+        /// <inheritdoc />
+        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var code = this.items.Length;
@@ -125,5 +157,17 @@ namespace Markov
 
             return code;
         }
+
+        /// <inheritdoc />
+        public int IndexOf(T item) => throw new NotSupportedException();
+
+        /// <inheritdoc />
+        public void Insert(int index, T item) => throw new NotSupportedException();
+
+        /// <inheritdoc />
+        public bool Remove(T item) => throw new NotSupportedException();
+
+        /// <inheritdoc />
+        public void RemoveAt(int index) => throw new NotSupportedException();
     }
 }

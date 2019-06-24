@@ -64,5 +64,62 @@ namespace Markov
                 chain.Add(items);
             }
         }
+
+        /// <summary>
+        /// Randomly walks the chain, backing off the order when necessary.
+        /// </summary>
+        /// <param name="rand">The random number source for the chain.</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> of the items chosen.</returns>
+        /// <remarks>Assumes an empty starting state.</remarks>
+        public IEnumerable<T> Chain(Random rand)
+        {
+            Queue<T> workingQueue = new Queue<T>();
+
+            while (true)
+            {
+                foreach (MarkovChain<T> chain in this.chains)
+                {
+                    Dictionary<T, int> nextStates = chain.GetNextStates(workingQueue);
+                    if (nextStates is null)
+                    {
+                        if (chain == this.chains.Last())
+                        {
+                            yield break;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+
+                    if (nextStates.Count >= this.desiredNumNextStates || chain == this.chains.Last())
+                    {
+                        int totalNonTerminalWeight = nextStates.Sum(w => w.Value);
+
+                        int terminalWeight = chain.GetTerminalWeight(workingQueue);
+                        int randomValue = rand.Next(totalNonTerminalWeight + terminalWeight) + 1;
+
+                        if (randomValue > totalNonTerminalWeight)
+                        {
+                            yield break;
+                        }
+
+                        int currentWeight = 0;
+                        foreach (var nextItem in nextStates)
+                        {
+                            currentWeight += nextItem.Value;
+                            if (currentWeight >= randomValue)
+                            {
+                                yield return nextItem.Key;
+                                workingQueue.Enqueue(nextItem.Key);
+                                break;
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

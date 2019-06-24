@@ -82,7 +82,7 @@ namespace Markov
                     Dictionary<T, int> nextStates = chain.GetNextStates(workingQueue);
                     if (nextStates is null)
                     {
-                        if (chain == this.chains.Last())
+                        if (chain.Order <= 1)
                         {
                             yield break;
                         }
@@ -92,7 +92,7 @@ namespace Markov
                         }
                     }
 
-                    if (nextStates.Count >= this.desiredNumNextStates || chain == this.chains.Last())
+                    if (nextStates.Count >= this.desiredNumNextStates || chain.Order <= 1)
                     {
                         int totalNonTerminalWeight = nextStates.Sum(w => w.Value);
 

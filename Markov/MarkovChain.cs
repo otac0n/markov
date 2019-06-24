@@ -40,6 +40,14 @@ namespace Markov
         }
 
         /// <summary>
+        /// Gets the order of the chain.
+        /// </summary>
+        public int Order
+        {
+            get => this.order;
+        }
+
+        /// <summary>
         /// Adds the items to the generator with a weight of one.
         /// </summary>
         /// <param name="items">The items to add to the generator.</param>

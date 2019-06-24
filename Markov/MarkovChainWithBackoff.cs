@@ -52,5 +52,17 @@ namespace Markov
                 this.chains.Add(new MarkovChain<T>(order));
             }
         }
+
+        /// <summary>
+        /// Adds the items to the generator with a weight of one.
+        /// </summary>
+        /// <param name="items">The items to add to the generator.</param>
+        public void Add(IEnumerable<T> items)
+        {
+            foreach (MarkovChain<T> chain in this.chains)
+            {
+                chain.Add(items);
+            }
+        }
     }
 }

@@ -13,7 +13,6 @@ namespace Markov
     public class MarkovChainWithBackoff<T>
         where T : IEquatable<T>
     {
-        private readonly int maximumOrder;
         private readonly List<MarkovChain<T>> chains = new List<MarkovChain<T>>();
         private readonly int desiredNumNextStates;
 
@@ -44,7 +43,6 @@ namespace Markov
                 throw new ArgumentOutOfRangeException(nameof(desiredNumNextStates));
             }
 
-            this.maximumOrder = maximumOrder;
             this.desiredNumNextStates = desiredNumNextStates;
 
             for (var order = maximumOrder; order > 0; order--)

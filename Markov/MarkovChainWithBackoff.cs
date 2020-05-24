@@ -14,8 +14,8 @@ namespace Markov
         where T : IEquatable<T>
     {
         private readonly int maximumOrder;
-        private readonly int desiredNumNextStates;
         private readonly List<MarkovChain<T>> chains = new List<MarkovChain<T>>();
+        private readonly int desiredNumNextStates;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MarkovChainWithBackoff{T}"/> class.
@@ -47,7 +47,7 @@ namespace Markov
             this.maximumOrder = maximumOrder;
             this.desiredNumNextStates = desiredNumNextStates;
 
-            for (int order = maximumOrder; order > 0; order--)
+            for (var order = maximumOrder; order > 0; order--)
             {
                 this.chains.Add(new MarkovChain<T>(order));
             }
@@ -59,7 +59,7 @@ namespace Markov
         /// <param name="items">The items to add to the generator.</param>
         public void Add(IEnumerable<T> items)
         {
-            foreach (MarkovChain<T> chain in this.chains)
+            foreach (var chain in this.chains)
             {
                 chain.Add(items);
             }
@@ -73,13 +73,13 @@ namespace Markov
         /// <remarks>Assumes an empty starting state.</remarks>
         public IEnumerable<T> Chain(Random rand)
         {
-            Queue<T> workingQueue = new Queue<T>();
+            var workingQueue = new Queue<T>();
 
             while (true)
             {
-                foreach (MarkovChain<T> chain in this.chains)
+                foreach (var chain in this.chains)
                 {
-                    Dictionary<T, int> nextStates = chain.GetNextStates(workingQueue);
+                    var nextStates = chain.GetNextStates(workingQueue);
                     if (nextStates is null)
                     {
                         if (chain.Order <= 1)
@@ -94,17 +94,17 @@ namespace Markov
 
                     if (nextStates.Count >= this.desiredNumNextStates || chain.Order <= 1)
                     {
-                        int totalNonTerminalWeight = nextStates.Sum(w => w.Value);
+                        var totalNonTerminalWeight = nextStates.Sum(w => w.Value);
 
-                        int terminalWeight = chain.GetTerminalWeight(workingQueue);
-                        int randomValue = rand.Next(totalNonTerminalWeight + terminalWeight) + 1;
+                        var terminalWeight = chain.GetTerminalWeight(workingQueue);
+                        var randomValue = rand.Next(totalNonTerminalWeight + terminalWeight) + 1;
 
                         if (randomValue > totalNonTerminalWeight)
                         {
                             yield break;
                         }
 
-                        int currentWeight = 0;
+                        var currentWeight = 0;
                         foreach (var nextItem in nextStates)
                         {
                             currentWeight += nextItem.Value;

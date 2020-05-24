@@ -8,14 +8,14 @@ namespace Markov.Tests
 
     public class MarkovChainWithBackoffTests
     {
-        [Theory]
-        [InlineData(0)]
-        [InlineData(-100)]
-        [InlineData(int.MinValue)]
-        public void Ctor_WithMaximumOrderLessThanOne_ThrowsArgumentOutOfRangeException(int maximumOrder)
+        [Fact]
+        public void Chain_WithRestrictiveMaximumOrder_DoesntAlwaysQuoteCorpus()
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() =>
-                new MarkovChainWithBackoff<char>(maximumOrder, 10));
+            var chainWithBackoff = new MarkovChainWithBackoff<char>(5, 2);
+            chainWithBackoff.Add("fool");
+            var deterministicRand = new Random(0);
+            var resultWithBackoff = string.Join("", chainWithBackoff.Chain(deterministicRand));
+            Assert.Equal("fol", resultWithBackoff);
         }
 
         [Theory]
@@ -28,14 +28,14 @@ namespace Markov.Tests
                 new MarkovChainWithBackoff<char>(10, desiredNumNextStates));
         }
 
-        [Fact]
-        public void Chain_WithRestrictiveMaximumOrder_DoesntAlwaysQuoteCorpus()
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-100)]
+        [InlineData(int.MinValue)]
+        public void Ctor_WithMaximumOrderLessThanOne_ThrowsArgumentOutOfRangeException(int maximumOrder)
         {
-            MarkovChainWithBackoff<char> chainWithBackoff = new MarkovChainWithBackoff<char>(5, 2);
-            chainWithBackoff.Add("fool");
-            Random deterministicRand = new Random(0);
-            string resultWithBackoff = string.Join("", chainWithBackoff.Chain(deterministicRand));
-            Assert.Equal("fol", resultWithBackoff);
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                new MarkovChainWithBackoff<char>(maximumOrder, 10));
         }
     }
 }

@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/DotNetAnalyzers/StyleCopAnalyzers/master/StyleCop.Analyzers/StyleCop.Analyzers/Settings/stylecop.schema.json",
   "settings": {
     "documentationRules": {
-      "copyrightText": "Copyright © John Gietzen. All Rights Reserved. This source is subject to the MIT license. Please see license.md for more information.",
+      "copyrightText": "Copyright Â© John Gietzen and Contributors. All Rights Reserved. This source is subject to the MIT license. Please see license.md for more information.",
       "xmlHeader": false
     }
   }

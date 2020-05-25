@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
-    <Authors>John Gietzen</Authors>
-    <Copyright>Copyright © 2018 $(Authors)</Copyright>
+    <Authors>John Gietzen and Contributors</Authors>
+    <Copyright>Copyright © 2018-2020 $(Authors)</Copyright>
     <Product>Markov</Product>
     <NeutralLanguage>en-US</NeutralLanguage>
   </PropertyGroup>

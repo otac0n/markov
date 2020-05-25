@@ -1,4 +1,4 @@
-// Copyright © John Gietzen. All Rights Reserved. This source is subject to the MIT license. Please see license.md for more information.
+// Copyright © John Gietzen and Contributors. All Rights Reserved. This source is subject to the MIT license. Please see license.md for more information.
 
 namespace Markov
 {
@@ -40,6 +40,14 @@ namespace Markov
         }
 
         /// <summary>
+        /// Gets the order of the chain.
+        /// </summary>
+        public int Order
+        {
+            get => this.order;
+        }
+
+        /// <summary>
         /// Adds the items to the generator with a weight of one.
         /// </summary>
         /// <param name="items">The items to add to the generator.</param>
@@ -71,18 +79,7 @@ namespace Markov
                 }
             }
 
-            var terminalKey = new ChainState<T>(previous);
-            var newWeight = Math.Max(0, this.terminals.ContainsKey(terminalKey)
-                ? weight + this.terminals[terminalKey]
-                : weight);
-            if (newWeight == 0)
-            {
-                this.terminals.Remove(terminalKey);
-            }
-            else
-            {
-                this.terminals[terminalKey] = newWeight;
-            }
+            this.AddTerminalInternal(new ChainState<T>(previous), weight);
         }
 
         /// <summary>
@@ -160,7 +157,7 @@ namespace Markov
         /// of the specified state transition.  This can therefore be used to remove items from
         /// the generator. The resulting weight will never be allowed below zero.
         /// </remarks>
-        public void Add(ChainState<T> state, T next, int weight)
+        public virtual void Add(ChainState<T> state, T next, int weight)
         {
             if (state == null)
             {
@@ -255,12 +252,13 @@ namespace Markov
 
                 var key = new ChainState<T>(state);
 
-                if (!this.items.TryGetValue(key, out var weights))
+                var weights = this.GetNextStatesInternal(key);
+                if (weights == null)
                 {
                     yield break;
                 }
 
-                this.terminals.TryGetValue(key, out var terminalWeight);
+                var terminalWeight = this.GetTerminalWeight(key);
 
                 var total = weights.Sum(w => w.Value);
                 var value = rand.Next(total + terminalWeight) + 1;
@@ -313,19 +311,15 @@ namespace Markov
         /// <returns>A dictionary of the items and their weight.</returns>
         public Dictionary<T, int> GetNextStates(ChainState<T> state)
         {
-            if (this.items.TryGetValue(state, out var weights))
-            {
-                return new Dictionary<T, int>(weights);
-            }
-
-            return null;
+            var weights = this.GetNextStatesInternal(state);
+            return weights != null ? new Dictionary<T, int>(weights) : null;
         }
 
         /// <summary>
         /// Gets all of the states that exist in the generator.
         /// </summary>
         /// <returns>An enumerable collection of <see cref="ChainState{T}"/> containing all of the states in the generator.</returns>
-        public IEnumerable<ChainState<T>> GetStates()
+        public virtual IEnumerable<ChainState<T>> GetStates()
         {
             foreach (var state in this.items.Keys)
             {
@@ -362,10 +356,40 @@ namespace Markov
         /// </summary>
         /// <param name="state">The state preceding the items of interest.</param>
         /// <returns>A dictionary of the items and their weight.</returns>
-        public int GetTerminalWeight(ChainState<T> state)
+        public virtual int GetTerminalWeight(ChainState<T> state)
         {
             this.terminals.TryGetValue(state, out var weight);
             return weight;
         }
+
+        /// <summary>
+        /// Add a terminal with the given weight. Can be overridden by inheriting classes.
+        /// </summary>
+        /// <param name="state">The state preceding the items of interest.</param>
+        /// <param name="weight">The weight of the terminal to add.</param>
+        protected internal virtual void AddTerminalInternal(ChainState<T> state, int weight)
+        {
+            var newWeight = Math.Max(0, this.terminals.ContainsKey(state)
+                ? weight + this.terminals[state]
+                : weight);
+            if (newWeight == 0)
+            {
+                this.terminals.Remove(state);
+            }
+            else
+            {
+                this.terminals[state] = newWeight;
+            }
+        }
+
+        /// <summary>
+        /// Gets the items from the generator that follow from the specified state preceding it without copying the values.
+        /// </summary>
+        /// <param name="state">The state preceding the items of interest.</param>
+        /// <returns>The raw dictionary of the items and their weight.</returns>
+        protected internal virtual Dictionary<T, int> GetNextStatesInternal(ChainState<T> state) =>
+            this.items.TryGetValue(state, out var weights)
+                ? weights
+                : null;
     }
 }

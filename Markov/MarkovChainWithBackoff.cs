@@ -60,22 +60,21 @@ namespace Markov
                 throw new ArgumentNullException(nameof(state));
             }
 
-            var orderTarget = this.GetOrderTarget(state);
-
-            if (orderTarget == this.Order)
+            for (var orderTarget = this.Order; orderTarget >= 1; orderTarget--)
             {
-                base.Add(state, next, weight);
-                orderTarget--;
-            }
-
-            for (; orderTarget >= 1; orderTarget--)
-            {
-                if (orderTarget < state.Count)
+                if (orderTarget == this.Order)
                 {
-                    state = new ChainState<T>(state.Skip(state.Count - orderTarget));
+                    base.Add(state, next, weight);
                 }
+                else
+                {
+                    if (orderTarget < state.Count)
+                    {
+                        state = new ChainState<T>(state.Skip(state.Count - orderTarget));
+                    }
 
-                this.chains[this.Order - orderTarget - 1].Add(state, next, weight);
+                    this.chains[this.Order - orderTarget - 1].Add(state, next, weight);
+                }
             }
         }
 
@@ -90,22 +89,21 @@ namespace Markov
 
         protected internal override void AddTerminalInternal(ChainState<T> state, int weight)
         {
-            var orderTarget = this.GetOrderTarget(state);
-
-            if (orderTarget == this.Order)
+            for (var orderTarget = this.Order; orderTarget >= 1; orderTarget--)
             {
-                base.AddTerminalInternal(state, weight);
-                orderTarget--;
-            }
-
-            for (; orderTarget >= 1; orderTarget--)
-            {
-                if (orderTarget < state.Count)
+                if (orderTarget == this.Order)
                 {
-                    state = new ChainState<T>(state.Skip(state.Count - orderTarget));
+                    base.AddTerminalInternal(state, weight);
                 }
+                else
+                {
+                    if (orderTarget < state.Count)
+                    {
+                        state = new ChainState<T>(state.Skip(state.Count - orderTarget));
+                    }
 
-                this.chains[this.Order - orderTarget - 1].AddTerminalInternal(state, weight);
+                    this.chains[this.Order - orderTarget - 1].AddTerminalInternal(state, weight);
+                }
             }
         }
 
@@ -118,7 +116,7 @@ namespace Markov
 
         private int GetDesiredOrderTarget(ref ChainState<T> state, out Dictionary<T, int> nextStates)
         {
-            for (var orderTarget = this.GetOrderTarget(state); ; orderTarget--)
+            for (var orderTarget = this.Order; ; orderTarget--)
             {
                 if (orderTarget == this.Order)
                 {
@@ -140,7 +138,5 @@ namespace Markov
                 }
             }
         }
-
-        private int GetOrderTarget(ChainState<T> state) => Math.Min(Math.Max(state.Count, 1), this.Order);
     }
 }

@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RuleSet Name="Markov.Tests" Description="Rules for the Markov.Tests project" ToolsVersion="14.0">
+<RuleSet Name="Markov.Tests" Description="Rules for the Markov.Tests project" ToolsVersion="16.0">
   <Include Path="..\Tests.ruleset" Action="Default" />
 </RuleSet>

@@ -1,11 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RuleSet Name="Strict" Description="A strict ruleset based on the Microsoft All Rules ruleset." ToolsVersion="14.0">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="Strict" Description="A strict ruleset based on the Microsoft All Rules ruleset." ToolsVersion="16.0">
   <IncludeAll Action="Warning" />
   <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
     <Rule Id="CA1006" Action="None" />
     <Rule Id="CA1020" Action="None" />
     <Rule Id="CA1026" Action="None" />
     <Rule Id="CA1500" Action="None" />
+    <Rule Id="CA1716" Action="None" />
+    <Rule Id="CA2202" Action="None" />
+    <Rule Id="CA2210" Action="None" />
+    <Rule Id="CA2243" Action="None" />
+  </Rules>
+  <Rules AnalyzerId="Microsoft.CodeQuality.Analyzers" RuleNamespace="Microsoft.CodeQuality.Analyzers">
+    <Rule Id="CA1006" Action="None" />
+    <Rule Id="CA1020" Action="None" />
+    <Rule Id="CA1026" Action="None" />
+    <Rule Id="CA1060" Action="Warning" />
+    <Rule Id="CA1500" Action="None" />
+    <Rule Id="CA1716" Action="None" />
     <Rule Id="CA2202" Action="None" />
     <Rule Id="CA2210" Action="None" />
     <Rule Id="CA2243" Action="None" />

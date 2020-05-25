@@ -9,17 +9,17 @@
     <TargetFrameworks>net35;netcoreapp2.0</TargetFrameworks>
     <Description>A Markov chain library, made to support scenarios anywhere from text generation to stock market simulation.</Description>
     <PackageIconUrl>https://raw.github.com/otac0n/markov/master/media/Markov.png</PackageIconUrl>
-    <PackageLicenseUrl>https://raw.github.com/otac0n/markov/master/license.md</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/otac0n/markov</PackageProjectUrl>
   </PropertyGroup>
   <ItemGroup>
-    <AdditionalFiles Include="..\stylecop.json" Link="stylecop.json" />
-    <AdditionalFiles Include="Markov.ruleset" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="FixMe" Version="1.0.0" PrivateAssets="All" />
     <PackageReference Include="GitVersionTask" Version="5.0.0-beta3-4" />
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.6.0" PrivateAssets="All" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta006" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8" PrivateAssets="All" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="All" />
+  </ItemGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="Markov.ruleset" />
+    <AdditionalFiles Include="..\stylecop.json" Link="stylecop.json" />
   </ItemGroup>
 </Project>

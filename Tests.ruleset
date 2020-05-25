@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RuleSet Name="Tests" Description="A test ruleset based on the Strict ruleset." ToolsVersion="14.0">
+<RuleSet Name="Tests" Description="A test ruleset based on the Strict ruleset." ToolsVersion="16.0">
   <Include Path="Strict.ruleset" Action="Default" />
   <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
+    <Rule Id="CA1062" Action="None" />
     <Rule Id="CA1305" Action="None" />
     <Rule Id="CA1707" Action="None" />
+    <Rule Id="CA1819" Action="None" />
+    <Rule Id="CA1822" Action="None" />
+  </Rules>
+  <Rules AnalyzerId="Microsoft.CodeQuality.Analyzers" RuleNamespace="Microsoft.CodeQuality.Analyzers">
+    <Rule Id="CA1062" Action="None" />
+    <Rule Id="CA1305" Action="None" />
+    <Rule Id="CA1707" Action="None" />
+    <Rule Id="CA1819" Action="None" />
     <Rule Id="CA1822" Action="None" />
   </Rules>
   <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">

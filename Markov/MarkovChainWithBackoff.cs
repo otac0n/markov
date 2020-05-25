@@ -79,21 +79,8 @@ namespace Markov
         }
 
         /// <inheritdoc/>
-        public override IEnumerable<ChainState<T>> GetStates()
-        {
-            foreach (var state in base.GetStates())
-            {
-                yield return state;
-            }
-
-            foreach (var chain in this.chains)
-            {
-                foreach (var state in chain.GetStates())
-                {
-                    yield return state;
-                }
-            }
-        }
+        public override IEnumerable<ChainState<T>> GetStates() =>
+            base.GetStates().Concat(this.chains.SelectMany(c => c.GetStates())).Distinct();
 
         /// <inheritdoc/>
         public override int GetTerminalWeight(ChainState<T> state)

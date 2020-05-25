@@ -12,19 +12,6 @@ namespace Markov.Tests
     {
         public static readonly string EmptySample = @"{}";
 
-        public static object[][] GetSerializationSamples()
-        {
-            return new[]
-          {
-            new object[] { "fool", 1, @"{'':{'f':1},'f':{'o':1},'o':{'o':1,'l':1},'l':{'':1}}" },
-            new object[] { "fool", 2, @"{'fo':{'o':1,'l':1},'oo':{'o':1,'l':1},'ol':{'':1},'':{'f':1},'f':{'o':1},'o':{'o':1,'l':1},'l':{'':1}}" },
-            new object[] { "food", 1, @"{'':{'f':1},'f':{'o':1},'o':{'o':1,'d':1},'d':{'':1}}" },
-            new object[] { "food", 2, @"{'fo':{'o':1,'d':1},'oo':{'o':1,'d':1},'od':{'':1},'':{'f':1},'f':{'o':1},'o':{'o':1,'d':1},'d':{'':1}}" },
-            new object[] { "loose", 1, @"{'':{'l':1},'l':{'o':1},'o':{'o':1,'s':1},'s':{'e':1},'e':{'':1}}" },
-            new object[] { "loose", 2, @"{'lo':{'o':1,'s':1},'oo':{'o':1,'s':1},'os':{'e':1},'se':{'':1},'':{'l':1},'l':{'o':1},'o':{'o':1,'s':1},'s':{'e':1},'e':{'':1}}" },
-        };
-        }
-
         public static IEnumerable<object[]> GetSampleDataForOppositeWeights()
         {
             foreach (var word in new string[] { "fool", "food", "loose" })
@@ -34,6 +21,44 @@ namespace Markov.Tests
                     yield return new object[] { word, maximumOrder };
                 }
             }
+        }
+
+        public static object[][] GetSerializationSamples()
+        {
+            return new[]
+            {
+                new object[] { "fool", 1, @"{'':{'f':1},'f':{'o':1},'o':{'o':1,'l':1},'l':{'':1}}" },
+                new object[] { "fool", 2, @"{'':{'f':1},'f':{'o':1},'fo':{'o':1,'l':1},'oo':{'o':1,'l':1},'ol':{'':1},'o':{'o':1,'l':1},'l':{'':1}}" },
+                new object[] { "food", 1, @"{'':{'f':1},'f':{'o':1},'o':{'o':1,'d':1},'d':{'':1}}" },
+                new object[] { "food", 2, @"{'':{'f':1},'f':{'o':1},'fo':{'o':1,'d':1},'oo':{'o':1,'d':1},'od':{'':1},'o':{'o':1,'d':1},'d':{'':1}}" },
+                new object[] { "loose", 1, @"{'':{'l':1},'l':{'o':1},'o':{'o':1,'s':1},'s':{'e':1},'e':{'':1}}" },
+                new object[] { "loose", 2, @"{'':{'l':1},'l':{'o':1},'lo':{'o':1,'s':1},'oo':{'o':1,'s':1},'os':{'e':1},'se':{'':1},'o':{'o':1,'s':1},'s':{'e':1},'e':{'':1}}" },
+            };
+        }
+
+        [Theory]
+        [MemberData(nameof(GetSerializationSamples))]
+        public void Add_WhenEmpty_AddsTheValuesToTheState(string sample, int maximumOrder, string serialized)
+        {
+            var chain = new MarkovChainWithBackoff<char>(maximumOrder, 2);
+
+            chain.Add(sample);
+
+            var result = Serialize(chain);
+            Assert.Equal(serialized, result);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetSampleDataForOppositeWeights))]
+        public void Add_WithOppositeWeight_ResetsInternalsToInitialState(string word, int maximumOrder)
+        {
+            var chain = new MarkovChainWithBackoff<char>(maximumOrder, 2);
+            chain.Add(word, 1);
+
+            chain.Add(word, -1);
+
+            var result = Serialize(chain);
+            Assert.Equal(EmptySample, result);
         }
 
         [Fact]
@@ -78,17 +103,6 @@ namespace Markov.Tests
         }
 
         [Fact]
-        public void GetNextStates_WithRestrictiveDesiredNextStatesValue_DoesBackOff()
-        {
-            var chainWithBackoff = new MarkovChainWithBackoff<char>(5, 2);
-            chainWithBackoff.Add("fool");
-
-            var nextStates = chainWithBackoff.GetNextStates("foo");
-
-            Assert.Equal(nextStates, new Dictionary<char, int> { { 'o', 1 }, { 'l', 1 } });
-        }
-
-        [Fact]
         public void GetNextStates_WithOverRestrictiveDesiredNextStatesValue_PicksBestPossibleOrder()
         {
             var chainWithBackoff = new MarkovChainWithBackoff<char>(5, 3);
@@ -99,29 +113,15 @@ namespace Markov.Tests
             Assert.Equal(nextStates, new Dictionary<char, int> { { 'o', 1 }, { 'l', 1 } });
         }
 
-        [Theory]
-        [MemberData(nameof(GetSerializationSamples))]
-        public void Add_WhenEmpty_AddsTheValuesToTheState(string sample, int maximumOrder, string serialized)
+        [Fact]
+        public void GetNextStates_WithRestrictiveDesiredNextStatesValue_DoesBackOff()
         {
-            var chain = new MarkovChainWithBackoff<char>(maximumOrder, 2);
+            var chainWithBackoff = new MarkovChainWithBackoff<char>(5, 2);
+            chainWithBackoff.Add("fool");
 
-            chain.Add(sample);
+            var nextStates = chainWithBackoff.GetNextStates("foo");
 
-            var result = Serialize(chain);
-            Assert.Equal(serialized, result);
-        }
-
-        [Theory]
-        [MemberData(nameof(GetSampleDataForOppositeWeights))]
-        public void Add_WithOppositeWeight_ResetsInternalsToInitialState(string word, int maximumOrder)
-        {
-            var chain = new MarkovChainWithBackoff<char>(maximumOrder, 2);
-            chain.Add(word, 1);
-
-            chain.Add(word, -1);
-
-            var result = Serialize(chain);
-            Assert.Equal(EmptySample, result);
+            Assert.Equal(nextStates, new Dictionary<char, int> { { 'o', 1 }, { 'l', 1 } });
         }
 
         private static string Serialize(MarkovChain<char> chain)

@@ -10,7 +10,7 @@ namespace Markov
     /// Builds and walks interconnected states based on probabilities probed at different depths.
     /// </summary>
     /// <typeparam name="T">The type of the constituent parts of each state in the Markov chain.</typeparam>
-    public class MarkovChainWithBackoff<T>
+    public class MarkovChainWithBackoff<T> : MarkovChain<T>
         where T : IEquatable<T>
     {
         private readonly List<MarkovChain<T>> chains = new List<MarkovChain<T>>();
@@ -32,6 +32,7 @@ namespace Markov
         /// <para>One is the lowest valid <paramref name="maximumOrder"/> and zero is the lowest valid<paramref name="desiredNumNextStates"/>.</para>
         /// </remarks>
         public MarkovChainWithBackoff(int maximumOrder, int desiredNumNextStates)
+            : base(maximumOrder)
         {
             if (maximumOrder < 1)
             {
@@ -45,79 +46,101 @@ namespace Markov
 
             this.desiredNumNextStates = desiredNumNextStates;
 
-            for (var order = maximumOrder; order > 0; order--)
+            for (var order = maximumOrder - 1; order > 0; order--)
             {
                 this.chains.Add(new MarkovChain<T>(order));
             }
         }
 
-        /// <summary>
-        /// Adds the items to the generator with a weight of one.
-        /// </summary>
-        /// <param name="items">The items to add to the generator.</param>
-        public void Add(IEnumerable<T> items)
+        /// <inheritdoc/>
+        public override void Add(ChainState<T> state, T next, int weight)
         {
-            foreach (var chain in this.chains)
+            if (state == null)
             {
-                chain.Add(items);
+                throw new ArgumentNullException(nameof(state));
+            }
+
+            var orderTarget = this.GetOrderTarget(state);
+
+            if (orderTarget == this.Order)
+            {
+                base.Add(state, next, weight);
+                orderTarget--;
+            }
+
+            for (; orderTarget >= 1; orderTarget--)
+            {
+                if (orderTarget < state.Count)
+                {
+                    state = new ChainState<T>(state.Skip(state.Count - orderTarget));
+                }
+
+                this.chains[this.Order - orderTarget - 1].Add(state, next, weight);
             }
         }
 
-        /// <summary>
-        /// Randomly walks the chain, backing off the order when necessary.
-        /// </summary>
-        /// <param name="rand">The random number source for the chain.</param>
-        /// <returns>An <see cref="IEnumerable{T}"/> of the items chosen.</returns>
-        /// <remarks>Assumes an empty starting state.</remarks>
-        public IEnumerable<T> Chain(Random rand)
+        /// <inheritdoc/>
+        public override int GetTerminalWeight(ChainState<T> state)
         {
-            var workingQueue = new Queue<T>();
+            var orderTarget = this.GetDesiredOrderTarget(ref state, out var _);
+            return orderTarget == this.Order
+                ? base.GetTerminalWeight(state)
+                : this.chains[this.Order - orderTarget - 1].GetTerminalWeight(state);
+        }
 
-            while (true)
+        protected internal override void AddTerminalInternal(ChainState<T> state, int weight)
+        {
+            var orderTarget = this.GetOrderTarget(state);
+
+            if (orderTarget == this.Order)
             {
-                foreach (var chain in this.chains)
+                base.AddTerminalInternal(state, weight);
+                orderTarget--;
+            }
+
+            for (; orderTarget >= 1; orderTarget--)
+            {
+                if (orderTarget < state.Count)
                 {
-                    var nextStates = chain.GetNextStates(workingQueue);
-                    if (nextStates is null)
+                    state = new ChainState<T>(state.Skip(state.Count - orderTarget));
+                }
+
+                this.chains[this.Order - orderTarget - 1].AddTerminalInternal(state, weight);
+            }
+        }
+
+        /// <inheritdoc/>
+        protected internal override Dictionary<T, int> GetNextStatesInternal(ChainState<T> state)
+        {
+            this.GetDesiredOrderTarget(ref state, out var nextStates);
+            return nextStates;
+        }
+
+        private int GetDesiredOrderTarget(ref ChainState<T> state, out Dictionary<T, int> nextStates)
+        {
+            for (var orderTarget = this.GetOrderTarget(state); ; orderTarget--)
+            {
+                if (orderTarget == this.Order)
+                {
+                    nextStates = base.GetNextStatesInternal(state);
+                }
+                else
+                {
+                    if (orderTarget < state.Count)
                     {
-                        if (chain.Order <= 1)
-                        {
-                            yield break;
-                        }
-                        else
-                        {
-                            continue;
-                        }
+                        state = new ChainState<T>(state.Skip(state.Count - orderTarget));
                     }
 
-                    if (nextStates.Count >= this.desiredNumNextStates || chain.Order <= 1)
-                    {
-                        var totalNonTerminalWeight = nextStates.Sum(w => w.Value);
+                    nextStates = this.chains[this.Order - orderTarget - 1].GetNextStatesInternal(state);
+                }
 
-                        var terminalWeight = chain.GetTerminalWeight(workingQueue);
-                        var randomValue = rand.Next(totalNonTerminalWeight + terminalWeight) + 1;
-
-                        if (randomValue > totalNonTerminalWeight)
-                        {
-                            yield break;
-                        }
-
-                        var currentWeight = 0;
-                        foreach (var nextItem in nextStates)
-                        {
-                            currentWeight += nextItem.Value;
-                            if (currentWeight >= randomValue)
-                            {
-                                yield return nextItem.Key;
-                                workingQueue.Enqueue(nextItem.Key);
-                                break;
-                            }
-                        }
-
-                        break;
-                    }
+                if (nextStates?.Count >= this.desiredNumNextStates || orderTarget <= 1)
+                {
+                    return orderTarget;
                 }
             }
         }
+
+        private int GetOrderTarget(ChainState<T> state) => Math.Min(Math.Max(state.Count, 1), this.Order);
     }
 }

@@ -79,6 +79,23 @@ namespace Markov
         }
 
         /// <inheritdoc/>
+        public override IEnumerable<ChainState<T>> GetStates()
+        {
+            foreach (var state in base.GetStates())
+            {
+                yield return state;
+            }
+
+            foreach (var chain in this.chains)
+            {
+                foreach (var state in chain.GetStates())
+                {
+                    yield return state;
+                }
+            }
+        }
+
+        /// <inheritdoc/>
         public override int GetTerminalWeight(ChainState<T> state)
         {
             var orderTarget = this.GetDesiredOrderTarget(ref state, out var _);
@@ -87,6 +104,7 @@ namespace Markov
                 : this.chains[this.Order - orderTarget - 1].GetTerminalWeight(state);
         }
 
+        /// <inheritdoc/>
         protected internal override void AddTerminalInternal(ChainState<T> state, int weight)
         {
             for (var orderTarget = this.Order; orderTarget >= 1; orderTarget--)

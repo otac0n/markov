@@ -80,7 +80,7 @@ namespace Markov
             {
                 return true;
             }
-            else if (a is null || b is null)
+            else if (a is null)
             {
                 return false;
             }

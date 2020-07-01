@@ -11,7 +11,15 @@
     <PackageIconUrl>https://raw.github.com/otac0n/markov/master/media/Markov.png</PackageIconUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/otac0n/markov</PackageProjectUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="FixMe" Version="1.0.0" PrivateAssets="All" />
     <PackageReference Include="GitVersionTask" Version="5.0.0-beta3-4" />
